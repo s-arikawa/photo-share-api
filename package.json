@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -e js,json,graphql"
+    "start": "nodemon -e js,json,graphql",
+    "main": "index.js"
   },
   "author": "",
   "license": "ISC",
