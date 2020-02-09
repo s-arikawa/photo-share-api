@@ -7,7 +7,7 @@ module.exports = {
     console.debug("post Photo :", newPhoto);
     const { insertedId } = await db.collection(`photos`).insertOne(newPhoto);
     console.debug("inserted", insertedId);
-    newPhoto.id = insertedId[0];
+    newPhoto.id = insertedId;
     return newPhoto;
   }
 };

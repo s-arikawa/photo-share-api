@@ -6,7 +6,7 @@ module.exports = {
     id: parent => parent._id,
     url: parent => `http://yoursite.com/img/${ parent._id }.jpg`,
     postedBy: async (parent, args, { db }) => {
-      return await db.collection(`users`).find({ "githubLogin": parent.githubUser });
+      return db.collection(`users`).find({ "githubLogin": parent.githubUser }).toArray();
     },
     taggedUsers: async (parent, args, { db }) => {
       const tags = await db.collection(`tags`).find({ "photoID": parent.id }).toArray();
