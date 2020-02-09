@@ -1,11 +1,13 @@
 module.exports = {
-  postPhoto(parent, args) {
+  async postPhoto(parent, args, { db }) {
     const newPhoto = {
-      id: _id++,
       ...args.input,
       created: new Date()
     };
-    photos.push(newPhoto);
+    console.debug("post Photo :", newPhoto);
+    const { insertedId } = await db.collection(`photos`).insertOne(newPhoto);
+    console.debug("inserted", insertedId);
+    newPhoto.id = insertedId[0];
     return newPhoto;
   }
 };

@@ -2,24 +2,35 @@ const { GraphQLScalarType } = require(`graphql`);
 
 module.exports = {
   Photo: {
-    url: parent => `http://yoursite.com/img/${ parent.id }.jpg`,
-    postedBy: parent => {
-      return users.find(u => u.githubLogin === parent.githubUser)
+    // mongodbのdocument._idをidで返すため
+    id: parent => parent._id,
+    url: parent => `http://yoursite.com/img/${ parent._id }.jpg`,
+    postedBy: async (parent, args, { db }) => {
+      return await db.collection(`users`).find({ "githubLogin": parent.githubUser });
     },
-    taggedUsers: parent => tags
-      .filter(tag => tag.photoID === parent.id)
-      .map(tag => tag.userID)
-      .map(userID => users.find(u => u.githubLogin === userID))
+    taggedUsers: async (parent, args, { db }) => {
+      const tags = await db.collection(`tags`).find({ "photoID": parent.id }).toArray();
+      console.debug("taggedUsers:", tags);
+      return tags
+        .map(tag => tag.userID)
+        .map(async (userID) => {
+          return db.collection(`users`).find({ "githubLogin": userID }).toArray();
+        });
+    }
   },
 
   User: {
-    postedPhotos: parent => {
-      return photos.filter(p => p.githubUser === parent.githubLogin)
+    postedPhotos: async (parent, args, { db }) => {
+      return db.collection(`photos`).find({ "githubUser": parent.githubLogin }).toArray();
     },
-    inPhotos: parent => tags
-      .filter(tag => tag.userID === parent.id)
-      .map(tag => tag.photoID)
-      .map(photoID => photos.find(p => p.id === photoID))
+    inPhotos: async (parent, args, { db }) => {
+      const tags = await db.collection(`tags`).find({ "userID": parent.id }).toArray();
+      return tags
+        .map(tag => tag.photoID)
+        .map(async (photoID) => {
+          return db.collection(`photos`).find({ "id": photoID }).toArray();
+        });
+    }
   },
 
   DateTime: new GraphQLScalarType({
