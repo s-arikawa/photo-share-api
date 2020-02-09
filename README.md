@@ -39,8 +39,6 @@ Node.jsでGraphQL APIを作る。
 
 ### 開発時もろもろバージョン
 * Node.js
-    * v8.15.1
+    * v12.15.0
 * npm
-    * 6.4.1
-
-> node.js古いな... ver up しよ...
+    * 6.13.4
