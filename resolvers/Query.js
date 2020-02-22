@@ -1,5 +1,5 @@
 module.exports = {
-  // 写真を格納した配列の長さを返す
+  // 写真をの数を返す
   totalPhotos: (parent, args, { db }) =>
     db.collection(`photos`).estimatedDocumentCount(),
 
@@ -12,5 +12,14 @@ module.exports = {
     } else {
       return photos;
     }
-  }
+  },
+
+  // ユーザーの数を返す
+  totalUsers: (parent, args, { db }) =>
+    db.collection("users").estimatedDocumentCount(),
+
+  // すべてのユーザーを返す
+  allUsers: (parent, args, { db }) =>
+    db.collection(`users`).find().toArray()
+
 };
