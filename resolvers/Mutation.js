@@ -1,9 +1,10 @@
+const fetch = require('node-fetch');
 const { authorizeWithGithub } = require('../lib');
 
 module.exports = {
   async postPhoto(parent, args, { db, currentUser }) {
     // 1. コンテキストにユーザーがいなければエラーを投げる
-    if(!currentUser) {
+    if (!currentUser) {
       throw new Error(`only an authorized user can post a photo`);
     }
     // 2. 現在のユーザーのIDとphotoを保存する
@@ -57,5 +58,24 @@ module.exports = {
 
     // 5. ユーザーデータとトークンを返す
     return { user, token: access_token }
+  },
+
+  /*
+   * フェイクユーザーを生成するミューテーション。
+   * https://randomuser.me/apiを使用する
+   * @param count 指定した数だけフェイクユーザーを作成する
+   * @return [User] 作成したユーザー
+   */
+  addFakeUsers: async (root, { count }, { db }) => {
+    const randomUserApi = `https://randomuser.me/api/?results=${ count }`;
+    let { results } = await fetch(randomUserApi).then(res => res.json());
+    let users = results.map(r => ({
+      githubLogin: r.login.username,
+      name: `${ r.name.first } ${ r.name.last }`,
+      avatar: r.picture.thumbnail,
+      githubToken: r.login.sha1
+    }));
+    await db.collection('users').insertMany(users);
+    return users;
   }
 };
