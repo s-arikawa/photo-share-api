@@ -27,6 +27,29 @@ Node.jsでGraphQL APIを作る。
     
 ## その他環境情報
 
+* Github OAuth Apps 設定
+    * Github OAuthを使った認可処理を実装しています。
+    * 詳細は説明しませんが、Authorization callback URL に `http://localhost:3000` を設定しています。
+
+* Github Auth 手動確認方法
+    * ブラウザで `https://github.com/login/oauth/authorize?client_id=<YOUR-CLIENT-ID>&scope=user` を開く。
+    * Githubのナビゲーションに従ってアプリケーションを認可する。
+    * アプリケーションを認可すると、Githubはコードをパラメータに追加した上で、 `http://localhost:3000?code=XYZ` にリダイレクトします。
+    * コードが XYZ だと仮定します。ブラウザのURLからコードをコピーして、githubAuthミューテーションを送信します。
+    * ```
+      mutation {
+        githubAuth(code: 'XYZ') {
+          token
+          user {
+            githubLogin
+            name
+            avatar
+          }
+        }
+      }
+      ```
+    * Github認可コードは期限付きです。すぐ期限が切れるので、再度最初の手順を行って、コードを取り直します。
+
 ### MongoDBのデータベース
 * DB名:
     * photo-share
