@@ -12,17 +12,34 @@ const resolvers = require(`./resolvers`);
 
 async function start() {
   const app = express();
-
   const MONGO_DB = process.env.DB_HOME;
+
   const client = await MongoClient.connect(
     MONGO_DB,
-    { useUnifiedTopology: true }
+    {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    }
   );
+
   const db = client.db();
 
   const context = { db };
 
-  const server = new ApolloServer({ typeDefs, resolvers, context });
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: async ({ req }) => {
+      // Request header "authorization" から Githubアクセストークンを取得
+      const githubToken = req.headers.authorization;
+      // MongoDBに保存されているユーザーを取得 (未登録のユーザーの場合は nullを返す)
+      // currentUser コンテキストに追加する
+      const currentUser = await db.collection('users').findOne({ githubToken });
+      // db : MongoClient
+      // currentUser : リクエストしているユーザー
+      return { db, currentUser };
+    }
+  });
 
   server.applyMiddleware({ app });
 

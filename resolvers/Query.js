@@ -1,4 +1,7 @@
 module.exports = {
+  // リクエストしているユーザー自身を返す。
+  me: (parent, args, { currentUser }) => currentUser,
+
   // 写真をの数を返す
   totalPhotos: (parent, args, { db }) =>
     db.collection(`photos`).estimatedDocumentCount(),
