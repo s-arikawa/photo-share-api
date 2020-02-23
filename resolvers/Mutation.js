@@ -77,5 +77,21 @@ module.exports = {
     }));
     await db.collection('users').insertMany(users);
     return users;
+  },
+
+  /*
+   * フェイクユーザーのGithub Access Tokenを調べるミューテーション
+   * @param [String] githubLogin Github User ID
+   * @return [User] + Github Access Token
+   */
+  fakeUserAuth: async (parent, { githubLogin }, { db }) => {
+    const user = await db.collection('users').findOne({ githubLogin });
+    if(!user) {
+      throw new Error(`Cannot find user with githubLogin ${githubLogin}`);
+    }
+    return {
+      token: user.githubToken,
+      user
+    }
   }
 };
