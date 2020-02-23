@@ -1,9 +1,15 @@
 const { authorizeWithGithub } = require('../lib');
 
 module.exports = {
-  async postPhoto(parent, args, { db }) {
+  async postPhoto(parent, args, { db, currentUser }) {
+    // 1. コンテキストにユーザーがいなければエラーを投げる
+    if(!currentUser) {
+      throw new Error(`only an authorized user can post a photo`);
+    }
+    // 2. 現在のユーザーのIDとphotoを保存する
     const newPhoto = {
       ...args.input,
+      userID: currentUser.githubLogin,
       created: new Date()
     };
     console.debug("post Photo :", newPhoto);
